@@ -1,16 +1,19 @@
 import React from "react";
-import type { GetStaticProps } from "next";
+import type { GetServerSideProps } from "next";
 import ReactMarkdown from "react-markdown";
 import Layout from "../../components/Layout";
 import Router from "next/router";
 import { PostProps } from "../../components/Post";
 import prisma from '../../lib/prisma'
 import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+// Rendered per request so unpublished drafts can be shown to their author only.
+export const getServerSideProps: GetServerSideProps = async ({ params, req, res }) => {
   const post = await prisma.post.findUnique({
     where: {
-      id: String(params?.id) ,
+      id: String(params?.id),
     },
     include: {
       author: {
@@ -18,20 +21,28 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
     },
   });
+  if (!post) {
+    return { notFound: true };
+  }
+  if (!post.published) {
+    const session = await getServerSession(req, res, authOptions);
+    if (!session || session.user?.email !== post.author?.email) {
+      return { notFound: true };
+    }
+  }
   return {
     props: post,
-    revalidate: 10,
   };
 };
 
-async function publishPost(id: number): Promise<void> {
+async function publishPost(id: string): Promise<void> {
   await fetch(`/api/publish/${id}`, {
     method: "PUT",
   });
   await Router.push("/")
 }
 
-async function deletePost(id: number): Promise<void> {
+async function deletePost(id: string): Promise<void> {
   await fetch(`/api/post/${id}`, {
     method: "DELETE",
   });
