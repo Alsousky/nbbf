@@ -1,0 +1,36 @@
+{
+  "name": "hello-next",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "dev": "next",
+    "build": "npx prisma generate && next build",
+    "start": "next start",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "dependencies": {
+    "@next-auth/prisma-adapter": "1.0.7",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "next": "13.5.11",
+    "next-auth": "4.24.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-markdown": "8.0.7"
+  },
+  "devDependencies": {
+    "@types/next-auth": "3.15.0",
+    "@types/node": "16.18.126",
+    "@types/react": "17.0.93",
+    "dotenv": "^17.2.3",
+    "prisma": "7.10.1",
+    "string-replace-loader": "^3.2.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
